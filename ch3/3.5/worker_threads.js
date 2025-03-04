@@ -2,7 +2,7 @@ const {
   Worker, isMainThread, parentPort,
 } = require('worker_threads');
 
-if (isMainThread) { // 부모일 때
+if (isMainThread) { // 부모일 때 (메인 스레드)
   const worker = new Worker(__filename);
   worker.on('message', message => console.log('from worker', message));
   worker.on('exit', () => console.log('worker exit'));

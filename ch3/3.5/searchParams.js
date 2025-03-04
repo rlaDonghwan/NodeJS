@@ -7,11 +7,11 @@ console.log('searchParams.has():', myURL.searchParams.has('page'));
 console.log('searchParams.keys():', myURL.searchParams.keys());
 console.log('searchParams.values():', myURL.searchParams.values());
 
-myURL.searchParams.append('filter', 'es3');
+myURL.searchParams.append('filter', 'es3'); //추가
 myURL.searchParams.append('filter', 'es5');
-console.log(myURL.searchParams.getAll('filter'));
+console.log(myURL.searchParams.getAll('filter')); // 모두 가져와
 
-myURL.searchParams.set('filter', 'es6');
+myURL.searchParams.set('filter', 'es6'); // 기존에 필터 값을 es6로 변경
 console.log(myURL.searchParams.getAll('filter'));
 
 myURL.searchParams.delete('filter');
