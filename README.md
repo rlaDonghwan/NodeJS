@@ -9,6 +9,22 @@
 - **논블로킹**: 이전 작업 완료 대기 없이 바로 다음 작업 수행
 - **블로킹**: 이전 작업이 끝나야 다음 작업 수행 가능
 
+### 자바 스크립트 런타임
+- 노드는 자바스크립트 런타임이다
+- 런타임은 특정 언어로 만든 프로그램을 실행 할 수 있는 환경을 뜻한다.;
+- 노드는 자바스크립트 실행기라고 봐도 무방하다.
+
+### 이벤트 기반
+- 이벤트가 발생할 때 미리 지정해둔 작업을 수행하는 방식을 의미한다.
+- 이벤트로는 클릭이나 네트워크  요청 등이 있을 수 있다.
+- 이벤트 기반 시스템에서는 특정 이번트가 발생할 떄 무엇을 할지 미리 등록 해둬야 한다. 이를 **이벤트 리스터**에 **콜백**함수를 등록한다고 표현한다.
+ex) 클릭 이벤트 리스너에 경고창을 띄우는 골백 함수를 등록해두면 클릭 이벤트가 발생할 때마다 콜백 함수가 실행돼 경고 창이 뜬다.
+  
+#### 이벤트 루프
+- 이벤트가 동시에 발생했을 때 어떤 순서로 콜백 함수를 호출할지를 이벤트 루프가 판단한다. 
+- 노드는 자바스크립트 코드의 맨 위부터 한 줄씩 실행한다. 
+- 함수를 호출 부분을 발견했다면 호출한 함수를 호출 스택에 넣는다.
+
 ---
 
 ### 2. 스레드와 프로세스
@@ -391,7 +407,7 @@ console.log('3번', data.toString());
 console.log('끝');
 ```
 sync는 코드를 이해하기는 쉽지만 치명적인 단점이 있다.
-readFileSync 메서드를 사용하면 요청이 수백 개 이상 들어올 때 성능에 문제가 생긴다. 싱크 메서드를 사용할 때는 이전 작업이 오나료되어야 다음 작업을 진행 할 수 있다. 즉 백그라운드가 작업 하는 동안 메인스레드는 아무것도 못하고 대기하고 있어야 하며, 메인 스레드가 일을 하지 않고 노는 시간이 생기므로 비효율적이다.
+readFileSync 메서드를 사용하면 요청이 수백 개 이상 들어올 때 성능에 문제가 생긴다. 싱크 메서드를 사용할 때는 이전 작업이 오나료되어야 다음 작업을 진행 할 수 있다. 즉 백그라운드가 작업 하는 동안 메인스레드는 아무것도 못하고 대기하고 있어야 하며, 메인 스레드가 일을 하지 않고 노는 시간이 생기기 때문에 비효율적이다.
 ```javascript
 const fs = require('fs').promises;
 
@@ -428,9 +444,168 @@ fs.readFile('./readme2.txt')
 
 - 버퍼 스트림: 앞에서 readFile 메서드를 사용할 때 읽었던 파일이 버퍼 형식으로 출력 되었습니다. 노드는 파일을 읽을 때 메모리에 파일 크기만큼 공간을 마련해두며 파일 데이터를 메모리에 저장한 뒤 사용자가 조작할 수 있도록 한다. 이때 메모리에 저장된 데이터가 **버퍼**이다.
 
+createReadStream으로 파일을 읽고 그 스트림을 전달받아 createWriteStream으로 파일을 쓸 수도 있다. 
+스트림 끼리 연결하는 것을 **파이핑한다**라고 표현한다.
+```javascript
+const fs = require('fs');
+
+const readStream = fs.createReadStream('readme4.txt'); // 파일을 읽어오는 스트림 생성
+const writeStream = fs.createWriteStream('writeme3.txt'); // 파일을 쓰는 스트림 생성
+readStream.pipe(writeStream);
+
+const zlibStream = zlib.createGzip(); // zlib 스트림 생성
+```
+- zlibStream: zlib 모듈도 제공하여 버퍼 데이터가 전달되다가 gzip 압축을 거친 후 압축 파일을 생성한다.
 
 
 
+
+#### 기타 fs 메서드 알아보기
+```javascript
+const fs = require('fs');
+//fs.access(경로, 옵션, 콜백)
+fs.access('./folder', fs.constants.F_OK | fs.constants.R_OK | fs.constants.W_OK, (err) => { // 폴더나 파일에 접근할 수 있는지 체크
+  if (err) {
+    if (err.code === 'ENOENT') {
+      console.log('폴더 없음');
+      //fs.mkdir (경로, 콜백)
+      fs.mkdir('./folder', (err) => {  // 폴더 생성
+        if (err) {
+          throw err;
+        }
+        console.log('폴더 만들기 성공');
+        //fs.open(경로, 옵션, 콜백)
+        fs.open('./folder/file.js', 'w', (err, fd) => { // 파일 생성
+          if (err) {
+            throw err;
+          }
+          console.log('빈 파일 만들기 성공', fd);
+          //fs.rename(기존 경로, 새 경로, 콜백)
+          fs.rename('./folder/file.js', './folder/newfile.js', (err) => { //  파일 이름 바꾸기
+            if (err) {
+              throw err;
+            }
+            console.log('이름 바꾸기 성공');
+          });
+        });
+      });
+    } else {
+      throw err;
+    }
+  } else {
+    console.log('이미 폴더 있음');
+  }
+});
+
+// 프로미스 버전
+
+const fs = require('fs').promises;
+const constants = require('fs').constants;
+
+fs.access('./folder', constants.F_OK | constants.W_OK | constants.R_OK)
+  .then(() => {
+    return Promise.reject('이미 폴더 있음');
+  })
+  .catch((err) => {
+    if (err.code === 'ENOENT') {
+      console.log('폴더 없음');
+      return fs.mkdir('./folder');
+    }
+    return Promise.reject(err);
+  })
+  .then(() => {
+    console.log('폴더 만들기 성공');
+    return fs.open('./folder/file.js', 'w');
+  })
+  .then((fd) => {
+    console.log('빈 파일 만들기 성공', fd);
+    return fs.rename('./folder/file.js', './folder/newfile.js');
+  })
+  .then(() => {
+    console.log('이름 바꾸기 성공');
+  })
+  .catch((err) => {
+    console.error(err);
+  });
+
+```
+
+#### 스레드 풀 알아보기
+- fs 모듈의 비동기 메서들을 사용해봤는데 비동기 메서드들은 백그라운드에서 실행되고, 실행된 후에는 다시 메인 스레드의 콜백 함수나 프로미스의 then 부분이 실행 됩니다. 이때 fs 메서드를 **여러 번 실행해도 백드라운드에서 동시에 처리되는 데, 바로 스레드 풀**이 있기 때문이다.
+
+```javascript
+const crypto = require('crypto');
+
+const pass = 'pass'; // 비밀번호
+const salt = 'salt'; // 솔트 값
+const start = Date.now(); // 시작 시간 기록
+
+// 첫 번째 비동기 pbkdf2 함수 호출
+crypto.pbkdf2(pass, salt, 1000000, 128, 'sha512', () => {
+  console.log('1:', Date.now() - start); // 작업 완료 시간 출력
+});
+
+// 두 번째 비동기 pbkdf2 함수 호출
+crypto.pbkdf2(pass, salt, 1000000, 128, 'sha512', () => {
+  console.log('2:', Date.now() - start); // 작업 완료 시간 출력
+});
+
+// 세 번째 비동기 pbkdf2 함수 호출
+crypto.pbkdf2(pass, salt, 1000000, 128, 'sha512', () => {
+  console.log('3:', Date.now() - start); // 작업 완료 시간 출력
+});
+
+// 네 번째 비동기 pbkdf2 함수 호출
+crypto.pbkdf2(pass, salt, 1000000, 128, 'sha512', () => {
+  console.log('4:', Date.now() - start); // 작업 완료 시간 출력
+});
+
+// 다섯 번째 비동기 pbkdf2 함수 호출
+crypto.pbkdf2(pass, salt, 1000000, 128, 'sha512', () => {
+  console.log('5:', Date.now() - start); // 작업 완료 시간 출력
+});
+
+// 여섯 번째 비동기 pbkdf2 함수 호출
+crypto.pbkdf2(pass, salt, 1000000, 128, 'sha512', () => {
+  console.log('6:', Date.now() - start); // 작업 완료 시간 출력
+});
+
+// 일곱 번째 비동기 pbkdf2 함수 호출
+crypto.pbkdf2(pass, salt, 1000000, 128, 'sha512', () => {
+  console.log('7:', Date.now() - start); // 작업 완료 시간 출력
+});
+
+// 여덟 번째 비동기 pbkdf2 함수 호출
+crypto.pbkdf2(pass, salt, 1000000, 128, 'sha512', () => {
+  console.log('8:', Date.now() - start); // 작업 완료 시간 출력
+});
+```
+- UV_THREADPOOL_SIZE=1 이렇게 입력하면 순서대로 실행 됌
+
+#### 이벤트 이해하기
+
+#### 예외 처리
+
+---
+### 4장
+
+```javascript
+const http = require('http'); //  1. http 모듈을 require로 불러온다.
+
+const server = http.createServer((req, res) => { // 2. http 모듈에는 createServer 메서드가 있다. 이 메서드는 인자로 요청에 대한 콜백 함수를 넣을 수 있다.
+  res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+  res.write('<h1>Hello Node!</h1>');
+  res.end('<p>Hello Server!</p>');
+});
+server.listen(8080); // 3. listen 메서드에 포트와 호스트를 넣어 서버를 실행한다.
+
+server.on('listening', () => {
+  console.log('8080번 포트에서 서버 대기 중입니다!');
+});
+server.on('error', (error) => {
+  console.error(error);
+});
+```
 
 
 
