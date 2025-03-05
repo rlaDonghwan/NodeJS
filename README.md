@@ -952,8 +952,7 @@ http2.createSecureServer({
 ---
 
 
-# 5 패키지 매니저
-node_modules는 커밋할 필요가없다.
+
 
 
 
