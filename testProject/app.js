@@ -13,11 +13,17 @@ const { v4: uuidv4 } = require('uuid');  // uuid 모듈에서 v4 메서드 불�
 const app = express();  // 익스프레스 애플리케이션 생성
 
 app.set('port', process.env.PORT || 3000);  // 사용할 포트 설정 (환경변수 없으면 3000 사용)
+app.set('views', path.join(__dirname, 'views'));  // 뷰 파일 경로 설정
+app.set('view engine', 'pug');  // 뷰 엔진 설정 (pug)
 //-----------------------------------------------------------------------------------
 const indexRouter = require('./routes');  // 라우터 불러오기
 const userRouter = require('./routes/user');  // user 라우터 불러오기
+const nunjucks = require('nunjucks');  // nunjucks 모듈 불러오기
 
-
+nunjucks.configure('views', {  // 템플릿 엔진 설정
+  express: app,
+  watch: true,
+});
 
 const upload = multer({  // multer 설정 시작
   storage: multer.diskStorage({  // 파일 저장 방식 설정 (디스크에 저장)
