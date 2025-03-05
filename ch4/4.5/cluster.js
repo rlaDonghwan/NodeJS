@@ -1,9 +1,9 @@
-const cluster = require('cluster');
-const http = require('http');
-const numCPUs = require('os').cpus().length;
+const cluster = require('cluster'); // 워커 스레드를 관리
+const http = require('http');// 워커 스레드에게 요청을 분배
+const numCPUs = require('os').cpus().length; // CPU 개수 구하기
 
-if (cluster.isMaster) {
-  console.log(`마스터 프로세스 아이디: ${process.pid}`);
+if (cluster.isMaster) { // 마스터 프로세스일 때
+  console.log(`마스터 프로세스 아이디: ${process.pid}`); // 마스터 프로세스의 아이디
   // CPU 개수만큼 워커를 생산
   for (let i = 0; i < numCPUs; i += 1) {
     cluster.fork();

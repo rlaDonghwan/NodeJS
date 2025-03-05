@@ -1,0 +1,15 @@
+{
+  "name": "npmtest-2025",
+  "version": "0.0.3",
+  "description": "hello package.json",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "patch-package"
+  },
+  "author": "ZeroCho",
+  "license": "ISC",
+  "devDependencies": {
+    "release-it": "^15.6.0"
+  }
+}
