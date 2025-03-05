@@ -950,7 +950,244 @@ http2.createSecureServer({
 - 포트를 공유하는 노드 프로세스를 여러 개 둘 수도 있어, 요청이 많이 들어왔을 때 병렬로 실행된 서버의 개수만큼 요청이 분산되게 할 수 있다.
 
 ---
+### Express 미들웨어 & Multer 정리
 
+아래는 미들웨어와 Multer에 대한 개념과 설명을
+깔끔하게 마크다운으로 정리한 버전이야.
+바로 복사해서 README.md나 노트 정리할 때 써도 돼.
+---
+
+# 🌐 미들웨어 (Middleware)
+
+#### 미들웨어란?
+- **요청(Request)과 응답(Response) 사이에서 동작하는 함수**.
+- 요청을 가로채 필요한 작업을 수행하고, 다음 미들웨어로 넘기거나 응답을 보냄.
+
+---
+
+#### 미들웨어 함수 구조
+```javascript
+function middleware(req, res, next) {
+    // 요청과 응답 사이에서 할 일 처리
+    next(); // 다음 미들웨어로 넘어가기
+}
+```
+
+### 미들웨어 종류
+
+| 종류 | 설명 | 예시 |
+|---|---|---|
+| 전역 미들웨어 | 모든 요청에 실행 | `app.use()` |
+| 라우터 미들웨어 | 특정 경로에서만 실행 | `app.get('/path', 미들웨어)` |
+| 에러 처리 미들웨어 | 에러 발생 시 실행 | `app.use((err, req, res, next) => {...})` |
+
+
+### 💡 주요 미들웨어 예시
+
+| 미들웨어 | 설명 |
+|---|---|
+| morgan | 요청 로그 출력 |
+| express.json() | JSON 본문 파싱 |
+| express.urlencoded() | Form 데이터 파싱 |
+| cookie-parser | 쿠키 파싱 |
+| express.static() | 정적 파일 제공 |
+| multer | 파일 업로드 처리 |
+
+---
+
+### 미들웨어 종류
+
+| 종류 | 설명 | 예시 |
+|---|---|---|
+| 전역 미들웨어 | 모든 요청에 실행 | `app.use()` |
+| 라우터 미들웨어 | 특정 경로에서만 실행 | `app.get('/path', 미들웨어)` |
+| 에러 처리 미들웨어 | 에러 발생 시 실행 | `app.use((err, req, res, next) => {...})` |
+
+---
+
+### 📥 미들웨어 동작 흐름
+
+요청 → 전역 미들웨어 → 라우터 미들웨어 → 응답
+↑
+에러 발생 시 에러 처리 미들웨어 호출
+
+---
+
+### 💡 주요 미들웨어 예시
+
+| 미들웨어 | 설명 |
+|---|---|
+| morgan | 요청 로그 출력 |
+| express.json() | JSON 본문 파싱 |
+| express.urlencoded() | Form 데이터 파싱 |
+| cookie-parser | 쿠키 파싱 |
+| express.static() | 정적 파일 제공 |
+| multer | 파일 업로드 처리 |
+
+---
+
+## 📂 Multer (파일 업로드 미들웨어)
+
+### 📌 Multer란?
+- Express 전용 파일 업로드 미들웨어
+- 요청 본문에 포함된 파일 데이터를 해석하고, 지정된 경로에 저장
+
+
+### 📥 기본 사용법
+```javascript
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
+
+app.post('/upload', upload.single('image'), (req, res) => {
+    console.log(req.file); // 업로드된 파일 정보
+    res.send('업로드 완료');
+});
+```
+
+⚙️ 저장 방식 설정 (diskStorage)
+	•	파일명, 저장 폴더 직접 제어 가능
+```javascript
+
+const storage = multer.diskStorage({
+    destination(req, file, cb) {
+        cb(null, 'uploads/');
+    },
+    filename(req, file, cb) {
+        const ext = path.extname(file.originalname);
+        cb(null, Date.now() + ext); // 파일명: 현재시간 + 확장자
+    }
+});
+const upload = multer({ storage });
+```
+### 📊 Multer 주요 메서드
+
+| 메서드 | 설명 | 저장 위치 |
+|---|---|---|
+| single() | 한 개 파일 업로드 | req.file |
+| array() | 여러 개 파일 (같은 name) | req.files |
+| fields() | 여러 개 파일 (다른 name) | req.files.필드명 |
+| none() | 파일 없이 데이터만 받기 | req.body |
+
+---
+
+### 🗂️ Multer 흐름 요약
+
+| 단계 | 설명 |
+|---|---|
+| 요청 | 클라이언트가 파일 업로드 요청 전송 |
+| multer 처리 | 파일 파싱 후 지정 폴더에 저장 |
+| 라우터 처리 | req.file 또는 req.files에서 파일 정보 사용 |
+
+---
+
+### 📣 정리 요점
+
+| 구분 | 설명 |
+|---|---|
+| 미들웨어 | 요청과 응답 사이에서 동작 |
+| multer | 파일 업로드 전용 미들웨어 |
+| 전역 미들웨어 | 모든 요청에서 동작 |
+| 라우터 미들웨어 | 특정 경로에서 동작 |
+| 에러 미들웨어 | 에러 발생 시 동작 |
+
+✅ 결론
+	•	미들웨어는 요청과 응답 흐름을 제어하는 필수 구성요소
+	•	Multer는 파일 업로드를 다룰 때 필수 미들웨어
+	•	파일 저장 방식, 업로드 용량 제한, 업로드 필드명 등을 모두 커스터마이징 가능
+
+```javascript
+const dotenv = require('dotenv');  // 환경변수 파일(.env)을 로드하는 모듈 불러오기
+dotenv.config();                    // .env 파일 읽어서 process.env에 넣기
+
+const express = require('express');  // 익스프레스 모듈 불러오기
+const path = require('path');        // 경로 관련 모듈 불러오기
+const morgan = require('morgan');    // 요청 로그 남기는 모듈 불러오기
+const cookieParser = require('cookie-parser');  // 쿠키 파싱 미들웨어 불러오기
+const session = require('express-session');     // 세션 관리 미들웨어 불러오기
+const multer = require('multer');    // 파일 업로드 처리 미들웨어 불러오기
+const fs = require('fs');            // 파일시스템 모듈 불러오기
+const { v4: uuidv4 } = require('uuid');  // uuid 모듈에서 v4 메서드 불러오기 (파일명 랜덤화에 사용)
+
+const app = express();  // 익스프레스 애플리케이션 생성
+
+app.set('port', process.env.PORT || 3000);  // 사용할 포트 설정 (환경변수 없으면 3000 사용)
+
+const upload = multer({  // multer 설정 시작
+  storage: multer.diskStorage({  // 파일 저장 방식 설정 (디스크에 저장)
+    destination(req, file, done) {  // 저장 경로 설정
+      const uploadPath = path.join(__dirname, 'uploads');  // 현재 폴더 밑에 uploads 폴더 지정
+      if (!fs.existsSync(uploadPath)) {  // uploads 폴더 없으면 생성
+        fs.mkdirSync(uploadPath);
+      }
+      done(null, uploadPath);  // 실제 저장 경로 지정
+    },
+    filename(req, file, done) {  // 저장할 파일명 설정
+      const ext = path.extname(file.originalname);  // 원본 파일의 확장자 추출
+      done(null, `${uuidv4()}${ext}`);  // 파일명은 랜덤 UUID + 원래 확장자
+    },
+  }),
+  limits: { fileSize: 10 * 1024 * 1024 },  // 파일 크기 제한 (10MB)
+});
+
+// 미들웨어 설정
+app.use(morgan('dev'));  // 요청 로그 출력 (개발용 설정)
+app.use('/', express.static(path.join(__dirname, 'public')));  // 정적 파일 제공(public 폴더)
+app.use(express.json());  // 요청 본문(json) 파싱
+app.use(express.urlencoded({ extended: false }));  // 요청 본문(form-urlencoded) 파싱
+app.use(cookieParser(process.env.COOKIE_SECRET));  // 쿠키 파싱 및 서명 처리
+app.use(session({  // 세션 설정
+  resave: false,  // 요청이 왔을 때 세션에 수정사항이 없어도 다시 저장할지 여부
+  saveUninitialized: false,  // 세션이 필요하기 전까지는 세션을 구동하지 않음
+  secret: process.env.COOKIE_SECRET,  // 쿠키 암호화 키 (env에서 불러옴)
+  cookie: { 
+    httpOnly: true,  // 자바스크립트에서 쿠키 접근 금지
+    secure: false,   // https가 아닌 환경에서도 사용
+  },
+  name: 'session-cookie',  // 세션 쿠키 이름 지정
+}));
+
+// 업로드 화면 라우터
+app.get('/upload', (req, res) => {
+  res.sendFile(path.join(__dirname, 'multipart.html'));  // 파일 업로드 폼 제공
+});
+
+// 파일 업로드 처리 라우터
+app.post('/upload', upload.fields([
+  { name: 'image1', maxCount: 1 },  // image1은 1개만
+  { name: 'image2', maxCount: 1 },  // image2도 1개만
+]), (req, res) => {
+  console.log(req.files.image1);  // 업로드된 image1 파일 정보 출력
+  console.log(req.files.image2);  // 업로드된 image2 파일 정보 출력
+  console.log(req.body.title);    // 함께 전송된 제목 데이터 출력
+  res.send('ok');  // 업로드 완료 응답
+});
+
+// 모든 요청에서 실행되는 공통 미들웨어
+app.use((req, res, next) => {
+  console.log('모든 요청에 다 실행됩니다.');  // 모든 요청마다 로그 출력
+  next();  // 다음 미들웨어로 이동
+});
+
+// 메인 페이지 요청 처리 라우터
+app.get('/', (req, res) => {
+  console.log('GET / 요청에서만 실행됩니다.');  // 로그 출력
+  res.sendFile(path.join(__dirname, 'index.html'));  // 메인 페이지 파일 제공
+});
+
+// 에러 처리 미들웨어
+app.use((err, req, res, next) => {
+  console.error(err);  // 에러 로그 출력
+  res.status(500).send(err.message);  // 500 에러 응답
+});
+
+// 서버 실행
+app.listen(app.get('port'), () => {
+  console.log(app.get('port'), '번 포트에서 대기 중');  // 서버 시작 로그
+});
+```
+---
+
+## Router 객체로 라우팅 분리하기
 
 
 
