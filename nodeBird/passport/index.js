@@ -11,9 +11,19 @@ module.exports = () => { // 모듈 내보내기
     });
 
     passport.deserializeUser((id, done) => { // 세션에 저장한 아이디를 통해 사용자 정보 객체를 불러옴
-        User.findOne({ where: { id } }) // 사용자 정보를 조회
-            .then(user => done(null, user)) // 조회 성공 시 사용자 정보 전달
-            .catch(err => done(err)); //    실패 시 에러 전달
+        User.findOne({ where: { id },
+            include: [{
+                model: User,
+                attributes: ['id', 'nick'],
+                as: 'Followers',
+            }, {
+                model: User,
+                attributes: ['id', 'nick'],
+                as: 'Followings',
+            }],
+        })
+            .then(user => done(null, user))
+            .catch(err => done(err));
     });
 
     local();
