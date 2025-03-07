@@ -1,4 +1,4 @@
-# Node.js 개념 정리
+  # Node.js 개념 정리
 
 ### 동시성(Blocking)과 비동기(Non-Blocking)
 | 구분 | 설명 |
@@ -1192,11 +1192,294 @@ app.listen(app.get('port'), () => {
 
 ---
 
+#### 시퀄라이즈
+
+- npm i express morgan nunjucks sequelize sequelize-cli mysql2
+- npm i -D nodemon
+- npx sequelize init
+
+# Learn Sequelize
+
+## 프로젝트 구조
+
+```
+learn-sequelize/
+├── config/
+│   └── config.json : DB 접속 정보
+├── migrations/
+├── models/
+│   ├── index.js : config.json + users.js + comments.js
+│   ├── users.js : users 테이블 매핑
+│   └── comments.js : comments 테이블 매핑
+├── node_modules/
+├── public/
+│   └── sequelize.js : 프론트 동작 매핑
+│       ├── axios.get('/users') : 사용자 리스트
+│       ├── axios.get(`/users/${id}/comments`) : 사용자가 입력한 댓글 리스트
+│       ├── axios.patch(`/comments/${comment.id}`, { comment: newComment }) : 댓글 수정
+│       ├── axios.delete(`/comments/${comment.id}`) : 댓글 삭제
+│       └── axios.post('/users', { name, age, married }) : 사용자 등록
+│       └── axios.post('/comments', { id, comment }) : 댓글 등록
+├── routes/
+│   ├── index.js : 
+│   │   └── / : User.findAll() : 유저 정보를 모두 가져와서 랜더링
+│   ├── users.js : 
+│   │   ├── /users : 
+│   │   │   ├── GET : User.findAll() : 유저 정보를 모두 가져와서 랜더링
+│   │   │   └── POST : User.create() : 유저 정보 입력
+│   │   └── /users/:id/comments : 댓글 정보를 모두 가져오면서 사용자 정보도 함께 가져옴
+│   │       └── Comment.findAll({
+│   │             include: {
+│   │               model: User,
+│   │               where: { id: req.params.id },
+│   │             },
+│   │           })
+│   ├── comments.js : 
+│   │   ├── /comments : Comment.create() : 댓글 입력
+│   │   └── /comments/:id : 
+│   │       ├── PATCH : Comment.update() : 댓글 수정
+│   │       └── DELETE : Comment.destroy() : 댓글 삭제
+├── seeders/
+├── views/
+│   ├── error.html
+│   └── sequelize.html
+├── app.js
+├── package-lock.json
+└── package.json
+```
+
+## 설치 및 초기화
+
+```sh
+npm i express morgan nunjucks sequelize sequelize-cli mysql2
+npm i -D nodemon
+npx sequelize init
+```
+
+## 설명
+
+### config
+- `config.json`: 데이터베이스 접속 정보
+
+### models
+- `index.js`: config.json + users.js + comments.js
+- `users.js`: users 테이블 매핑
+- `comments.js`: comments 테이블 매핑
+
+### public
+- `sequelize.js`: 프론트 동작 매핑
+  - `axios.get('/users')`: 사용자 리스트
+  - `axios.get(`/users/${id}/comments`)`: 사용자가 입력한 댓글 리스트
+  - `axios.patch(`/comments/${comment.id}`, { comment: newComment })`: 댓글 수정
+  - `axios.delete(`/comments/${comment.id}`)`: 댓글 삭제
+  - `axios.post('/users', { name, age, married })`: 사용자 등록
+  - `axios.post('/comments', { id, comment })`: 댓글 등록
+
+### routes
+- `index.js`: 
+  - `/`: User.findAll() : 유저 정보를 모두 가져와서 랜더링
+- `users.js`: 
+  - `/users`: 
+    - `GET`: User.findAll() : 유저 정보를 모두 가져와서 랜더링
+    - `POST`: User.create() : 유저 정보 입력
+  - `/users/:id/comments`: 댓글 정보를 모두 가져오면서 사용자 정보도 함께 가져옴
+    - `Comment.findAll({
+        include: {
+          model: User,
+          where: { id: req.params.id },
+        },
+      })`
+- `comments.js`: 
+  - `/comments`: Comment.create() : 댓글 입력
+  - `/comments/:id`: 
+    - `PATCH`: Comment.update() : 댓글 수정
+    - `DELETE`: Comment.destroy() : 댓글 삭제
+
+### views
+- `error.html`
+- `sequelize.html`
+
+### 기타 파일
+- `app.js`
+- `package-lock.json`
+- `package.json`
 
 
+```javascript
+const express = require("express"); // Express 모듈을 가져옴
+const cookieParser = require("cookie-parser"); // 쿠키 파싱 미들웨어를 가져옴
+const morgan = require("morgan"); // HTTP 요청 로깅 미들웨어를 가져옴
+const path = require("path"); // 파일 및 디렉토리 경로 관련 유틸리티를 가져옴
+const session = require("express-session"); // 세션 관리 미들웨어를 가져옴
+const nunjucks = require("nunjucks"); // 템플릿 엔진 Nunjucks를 가져옴
+const dotenv = require("dotenv"); // 환경 변수 관리 모듈을 가져옴
+
+dotenv.config(); // .env 파일에 정의된 환경 변수를 로드
+const pageRouter = require("./routes/page"); // 페이지 라우터를 가져옴
+
+const app = express(); // Express 애플리케이션 생성
+app.set("port", process.env.PORT || 8001); // 포트 설정, 환경 변수에 PORT가 설정되어 있지 않으면 8001번 포트를 사용
+app.set("view engine", "html"); // 뷰 엔진을 'html'로 설정
+nunjucks.configure("views", {
+  express: app, // Express 애플리케이션을 Nunjucks에 연결
+  watch: true, // 템플릿 파일 변경 시 자동으로 다시 로드
+});
+app.use(morgan("dev")); // HTTP 요청 로깅 미들웨어 설정 (개발 모드)
+app.use(express.static(path.join(__dirname, "public"))); // 정적 파일 제공 미들웨어 설정
+app.use(express.json()); // JSON 요청 본문을 파싱하는 미들웨어 설정
+app.use(express.urlencoded({ extended: false })); // URL-encoded 요청 본문을 파싱하는 미들웨어 설정
+app.use(cookieParser(process.env.COOKIE_SECRET)); // 쿠키 파싱 및 서명 처리 미들웨어 설정
+app.use(
+  session({
+    resave: false, // 세션이 수정되지 않아도 다시 저장할지 여부
+    saveUninitialized: false, // 초기화되지 않은 세션을 저장할지 여부
+    secret: process.env.COOKIE_SECRET, // 세션 암호화에 사용할 비밀 키
+    cookie: {
+      httpOnly: true, // 클라이언트에서 쿠키를 수정할 수 없도록 설정
+    },
+  })
+);
+
+app.use("/", pageRouter); // 페이지 라우터를 사용하여 루트 경로에 대한 요청을 처리
+
+app.use((req, res, next) => {
+  const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`); // 요청한 라우터가 없을 때 에러 생성
+  error.status = 404; // 에러 상태 코드를 404로 설정
+  next(error); // 다음 미들웨어로 에러 전달
+});
+```
+
+1. **`express`**: Express 애플리케이션을 생성하고 설정합니다.
+2. **`cookieParser`**: 쿠키를 파싱하고 서명 처리하는 미들웨어입니다.
+3. **`morgan`**: HTTP 요청을 로깅하는 미들웨어입니다. 개발 모드(`dev`)로 설정되어 있습니다.
+4. **`path`**: 파일 및 디렉토리 경로 관련 유틸리티를 제공합니다.
+5. **`session`**: 세션을 관리하는 미들웨어입니다. 세션을 암호화하고, 클라이언트에서 수정할 수 없도록 설정합니다.
+6. **`nunjucks`**: 템플릿 엔진으로, 템플릿 파일을 렌더링합니다.
+7. **`dotenv`**: 환경 변수를 관리하는 모듈로, `.env` 파일에 정의된 환경 변수를 로드합니다.
+8. **`pageRouter`**: 페이지 라우터로, 루트 경로(`/`)에 대한 요청을 처리합니다.
+9. **`express.static`**: 정적 파일을 제공하는 미들웨어입니다. `public` 디렉토리의 파일을 제공합니다.
+10. **`express.json`**: JSON 요청 본문을 파싱하는 미들웨어입니다.
+11. **`express.urlencoded`**: URL-encoded 요청 본문을 파싱하는 미들웨어입니다.
+12. **`cookieParser`**: 쿠키를 파싱하고 서명 처리하는 미들웨어입니다.
+13. **`session`**: 세션을 관리하는 미들웨어입니다.
+14. **404 에러 처리 미들웨어**: 요청한 라우터가 없을 때 404 에러를 생성하고 처리합니다.
+이 세 개의 파일은 Express 애플리케이션에서 서로 연동되어 동작합니다. 동작 순서는 다음과 같습니다:
+
+1. **`app.js`**: 애플리케이션의 진입점으로, 서버를 설정하고 실행합니다.
+2. **`routes/page.js`**: 라우터 파일로, 특정 경로에 대한 요청을 처리합니다.
+3. **`controllers/page.js`**: 컨트롤러 파일로, 라우터에서 호출되는 함수들을 정의합니다.
 
 
+```javascript
+// 프로필 페이지 렌더링 함수
+exports.renderProfile = (req, res) => {
+    res.render('profile', { title: '내 정보 - NodeBird' }); // 'profile' 뷰를 렌더링하고, 제목을 '내 정보 - NodeBird'로 설정
+};
+
+// 회원가입 페이지 렌더링 함수
+exports.renderJoin = (req, res) => {
+    res.render('join', { title: '회원가입 - NodeBird' }); // 'join' 뷰를 렌더링하고, 제목을 '회원가입 - NodeBird'로 설정
+};
+
+// 메인 페이지 렌더링 함수
+exports.renderMain = (req, res, next) => {
+    const twits = []; // 빈 트윗 배열 생성
+    res.render('main', {
+        title: 'NodeBird', // 제목을 'NodeBird'로 설정
+        twits, // 트윗 배열을 뷰에 전달
+    });
+};
+```
+
+### `req`, `res`, `next`의 의미
+
+- **`req` (Request)**: 클라이언트의 요청 객체입니다. 클라이언트가 서버로 보내는 모든 요청 정보가 담겨 있습니다. 예를 들어, 요청 경로, HTTP 메서드, 요청 본문, 쿼리 스트링, 헤더 등이 포함됩니다.
+
+- **`res` (Response)**: 서버의 응답 객체입니다. 서버가 클라이언트로 보내는 응답을 구성하는 데 사용됩니다. 예를 들어, 응답 본문, 상태 코드, 헤더 등을 설정할 수 있습니다. 여기서 `res.render` 메서드를 사용하여 특정 뷰를 렌더링하고 클라이언트에게 응답합니다.
+
+- **`next` (Next)**: 다음 미들웨어 함수를 호출하는 함수입니다. 현재 미들웨어 함수가 완료된 후, 다음 미들웨어 함수로 제어를 전달할 때 사용됩니다. 주로 에러 처리나 특정 조건에서 다음 미들웨어로 넘어갈 때 사용됩니다. 이 예제에서는 `renderMain` 함수에서 `next`가 사용되지 않았지만, 필요에 따라 사용할 수 있습니다.
+네, 맞습니다. `req`와 `res`는 각각 요청과 응답을 처리하는 객체입니다.
+
+### `req` (Request)
+- **설명**: 클라이언트가 서버로 보내는 요청 정보를 담고 있는 객체입니다.
+- **주요 속성**:
+  - `req.url`: 요청된 URL 경로
+  - `req.method`: HTTP 메서드 (GET, POST 등)
+  - `req.body`: 요청 본문 (POST 요청에서 주로 사용)
+  - `req.query`: 쿼리 스트링 파라미터
+  - `req.params`: URL 경로 파라미터
+  - `req.headers`: 요청 헤더
+
+### `res` (Response)
+- **설명**: 서버가 클라이언트로 보내는 응답을 구성하는 객체입니다.
+- **주요 메서드**:
+  - `res.send()`: 응답 본문을 클라이언트로 보냅니다.
+  - `res.json()`: JSON 형식의 응답 본문을 클라이언트로 보냅니다.
+  - `res.status()`: 응답 상태 코드를 설정합니다.
+  - `res.render()`: 템플릿 엔진을 사용하여 뷰를 렌더링하고 응답 본문으로 보냅니다.
+  - `res.redirect()`: 클라이언트를 다른 URL로 리디렉션합니다.
+
+### 예시 코드 설명
+
+```javascript
+// 프로필 페이지 렌더링 함수
+exports.renderProfile = (req, res) => {
+    res.render('profile', { title: '내 정보 - NodeBird' }); // 'profile' 뷰를 렌더링하고, 제목을 '내 정보 - NodeBird'로 설정
+};
+
+// 회원가입 페이지 렌더링 함수
+exports.renderJoin = (req, res) => {
+    res.render('join', { title: '회원가입 - NodeBird' }); // 'join' 뷰를 렌더링하고, 제목을 '회원가입 - NodeBird'로 설정
+};
+
+// 메인 페이지 렌더링 함수
+exports.renderMain = (req, res, next) => {
+    const twits = []; // 빈 트윗 배열 생성
+    res.render('main', {
+        title: 'NodeBird', // 제목을 'NodeBird'로 설정
+        twits, // 트윗 배열을 뷰에 전달
+    });
+};
+```
+
+- **`exports.renderProfile`**: 클라이언트가 `/profile` 경로로 요청을 보냈을 때 호출됩니다. `res.render('profile', { title: '내 정보 - NodeBird' })`를 통해 `profile` 뷰를 렌더링하고, 제목을 '내 정보 - NodeBird'로 설정하여 응답합니다.
+- **`exports.renderJoin`**: 클라이언트가 `/join` 경로로 요청을 보냈을 때 호출됩니다. `res.render('join', { title: '회원가입 - NodeBird' })`를 통해 `join` 뷰를 렌더링하고, 제목을 '회원가입 - NodeBird'로 설정하여 응답합니다.
+- **`exports.renderMain`**: 클라이언트가 루트 경로(`/`)로 요청을 보냈을 때 호출됩니다. `const twits = [];`로 빈 트윗 배열을 생성하고, `res.render('main', { title: 'NodeBird', twits })`를 통해 `main` 뷰를 렌더링하여 응답합니다. 여기서 `twits` 배열은 뷰에 전달됩니다.
+
+따라서, `req`는 클라이언트의 요청 정보를 담고 있고, `res`는 서버의 응답을 구성하여 클라이언트로 보내는 역할을 합니다.
 
 
+### 동작 순서
 
+1. **서버 시작 (`app.js`)**
+   - `app.js` 파일이 실행되면서 Express 애플리케이션이 생성되고 설정됩니다.
+   - 포트 설정, 뷰 엔진 설정, 미들웨어 설정 등이 이루어집니다.
+   - `app.use("/", pageRouter);`를 통해 루트 경로에 대한 요청을 `pageRouter`로 위임합니다.
+   - 서버가 설정된 포트에서 대기 상태로 들어갑니다.
+
+2. **라우터 설정 (`routes/page.js`)**
+   - `pageRouter`는 page.js 파일에서 정의된 라우터입니다.
+   - 모든 요청에 대해 공통적으로 실행되는 미들웨어가 설정됩니다.
+   - 특정 경로 (`/profile`, `/join`, `/`)에 대한 GET 요청이 들어오면 각각 `renderProfile`, `renderJoin`, `renderMain` 함수가 호출됩니다.
+
+3. **컨트롤러 함수 실행 (`controllers/page.js`)**
+   - page.js 파일에서 호출된 `renderProfile`, `renderJoin`, `renderMain` 함수는 page.js 파일에서 정의된 함수들입니다.
+   - 각 함수는 요청에 따라 적절한 뷰를 렌더링하고 응답을 반환합니다.
+
+### 예시 요청 흐름
+
+1. **클라이언트가 `/profile` 경로로 GET 요청을 보냅니다.**
+   - `app.js`에서 이 요청을 `pageRouter`로 위임합니다.
+   - page.js에서 `/profile` 경로에 대한 GET 요청을 처리하는 `router.get('/profile', renderProfile);`가 실행됩니다.
+   - `renderProfile` 함수가 page.js에서 호출되어 `profile` 뷰를 렌더링하고 응답을 반환합니다.
+
+2. **클라이언트가 `/join` 경로로 GET 요청을 보냅니다.**
+   - `app.js`에서 이 요청을 `pageRouter`로 위임합니다.
+   - page.js에서 `/join` 경로에 대한 GET 요청을 처리하는 `router.get('/join', renderJoin);`가 실행됩니다.
+   - `renderJoin` 함수가 page.js에서 호출되어 `join` 뷰를 렌더링하고 응답을 반환합니다.
+
+3. **클라이언트가 `/` 경로로 GET 요청을 보냅니다.**
+   - `app.js`에서 이 요청을 `pageRouter`로 위임합니다.
+   - page.js에서 `/` 경로에 대한 GET 요청을 처리하는 `router.get('/', renderMain);`가 실행됩니다.
+   - `renderMain` 함수가 page.js에서 호출되어 `main` 뷰를 렌더링하고 응답을 반환합니다.
 
