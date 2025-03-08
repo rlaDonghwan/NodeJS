@@ -1,7 +1,7 @@
 # Node.js 개념 정리
 
 <details>
-<summary>1. 노드 개념</summary>
+<summary><strong>1. 노드 개념</strong></summary>
 
 ### 동시성(Blocking)과 비동기(Non-Blocking)
 | 구분 | 설명 |
@@ -110,7 +110,7 @@ var hello = function() {
 </details>
 
 <details>
-<summary>2. 콜백 함수</summary>
+<summary><strong>2. 콜백 함수</strong></summary>
 
 ### this와 콜백 함수에서의 우회
 ```javascript
@@ -194,7 +194,7 @@ console.log(Human.breathe())
 </details>
 
 <details>
-<summary>3. 노드 기능 알아보기</summary>
+<summary><strong>3. 노드 기능 알아보기</strong></summary>
 
 #### URL
 - url 처리에는 크 두지 방식이 있다
@@ -362,7 +362,7 @@ process.stderr.on('data', function(data) {
 
 
 <details>
-<summary>4. 파일 시스템 접근하기 </summary>
+<summary><strong>4. 파일 시스템 접근하기 </strong></summary>
 
 ### 파일 시스템 접근하기
 - fs 모듈은 파일 시스템에 접근하는 모듈 입니다. 즉 파일을 생성하거나 삭제하고, 읽거나 쓸 수 있습니다. 또한, 폴더도 만들거나 지울 수 있습니다. 웹 브라우저에서 자바스크립트를 사용할 때는 일부를 제외하고는 파일 시스템 접근이 금지되어 있으므로 노드 fs 모듈이 낯설 것이다.
@@ -730,7 +730,7 @@ crypto.pbkdf2(pass, salt, 1000000, 128, 'sha512', () => {
 </details>
 
 <details>
-<summary>5. http 모듈 서버 만들기 </summary>
+<summary><strong>5. http 모듈 서버 만들기 </strong></summary>
 
 - 요청(Request): 클라이언트 -> 서버로 보내는 데이터 (ex. GET, POST 방식과 URL 정보 포함)
 - 응답(Response): 서버 -> 클라이언트로 보내는 데이터(ex. HTML, JSON, 상태 코드 등)
@@ -996,7 +996,7 @@ http2.createSecureServer({
 </details>
 
 <details>
-<summary>6. 익스프레스 웹 서버</summary>
+<summary><strong>6. 익스프레스 웹 서버</strong></summary>
 
 ### Express 미들웨어 & Multer 정리
 
@@ -1081,6 +1081,7 @@ function middleware(req, res, next) {
 - Express 전용 파일 업로드 미들웨어
 - 요청 본문에 포함된 파일 데이터를 해석하고, 지정된 경로에 저장
 
+---
 
 ####  기본 사용법
 ```javascript
@@ -1092,6 +1093,8 @@ app.post('/upload', upload.single('image'), (req, res) => {
     res.send('업로드 완료');
 });
 ```
+
+---
 
 #### 저장 방식 설정 (diskStorage)
 	•	파일명, 저장 폴더 직접 제어 가능
@@ -1141,10 +1144,14 @@ const upload = multer({ storage });
 | 라우터 미들웨어 | 특정 경로에서 동작 |
 | 에러 미들웨어 | 에러 발생 시 동작 |
 
+---
+
 #### 결론
 	•	미들웨어는 요청과 응답 흐름을 제어하는 필수 구성요소
 	•	Multer는 파일 업로드를 다룰 때 필수 미들웨어
 	•	파일 저장 방식, 업로드 용량 제한, 업로드 필드명 등을 모두 커스터마이징 가능
+
+---
 
 ```javascript
 const dotenv = require('dotenv');  // 환경변수 파일(.env)을 로드하는 모듈 불러오기
@@ -1240,7 +1247,7 @@ app.listen(app.get('port'), () => {
 </details>
 
 <details>
-<summary>7. Router 객체로 라우팅 분리하기</summary>
+<summary><strong>7. Router 객체로 라우팅 분리하기</strong></summary>
 
 ### 시퀄라이즈
 
