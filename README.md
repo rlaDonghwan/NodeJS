@@ -1,4 +1,7 @@
-  # Node.js 개념 정리
+# Node.js 개념 정리
+
+<details>
+<summary>1. 노드 개념</summary>
 
 ### 동시성(Blocking)과 비동기(Non-Blocking)
 | 구분 | 설명 |
@@ -9,17 +12,23 @@
 - **논블로킹**: 이전 작업 완료 대기 없이 바로 다음 작업 수행
 - **블로킹**: 이전 작업이 끝나야 다음 작업 수행 가능
 
+--- 
+
 ### 자바 스크립트 런타임
 - 노드는 자바스크립트 런타임이다
 - 런타임은 특정 언어로 만든 프로그램을 실행 할 수 있는 환경을 뜻한다.;
 - 노드는 자바스크립트 실행기라고 봐도 무방하다.
+
+---
 
 ### 이벤트 기반
 - 이벤트가 발생할 때 미리 지정해둔 작업을 수행하는 방식을 의미한다.
 - 이벤트로는 클릭이나 네트워크  요청 등이 있을 수 있다.
 - 이벤트 기반 시스템에서는 특정 이번트가 발생할 떄 무엇을 할지 미리 등록 해둬야 한다. 이를 **이벤트 리스터**에 **콜백**함수를 등록한다고 표현한다.
 ex) 클릭 이벤트 리스너에 경고창을 띄우는 골백 함수를 등록해두면 클릭 이벤트가 발생할 때마다 콜백 함수가 실행돼 경고 창이 뜬다.
-  
+
+---
+
 #### 이벤트 루프
 - 이벤트가 동시에 발생했을 때 어떤 순서로 콜백 함수를 호출할지를 이벤트 루프가 판단한다. 
 - 노드는 자바스크립트 코드의 맨 위부터 한 줄씩 실행한다. 
@@ -27,10 +36,7 @@ ex) 클릭 이벤트 리스너에 경고창을 띄우는 골백 함수를 등록
 
 ---
 
-
-<details>
-<summary>스레드와 프로세스</summary>
-
+### 스레드와 프로세스
 
 ### 싱글 스레드
 - 노드는 하나의 스레드로 요청 처리
@@ -54,9 +60,9 @@ ex) 클릭 이벤트 리스너에 경고창을 띄우는 골백 함수를 등록
 | **스레드** | 프로세스 내 실행 흐름 단위. 메모리 공유 O |
 
 ---
-</details>
 
-## 3. 서버로서의 Node.js
+#### 서버로서의 Node.js
+
 | 장점 | 설명 |
 |---|---|
 | 빠른 응답 | 실시간 채팅, 알림 서비스 적합 |
@@ -68,8 +74,7 @@ ex) 클릭 이벤트 리스너에 경고창을 띄우는 골백 함수를 등록
 
 ---
 
-## 변수 선언
-
+#### 변수 선언
 | 키워드 | 특징 | 설명 |
 |---|---|---|
 | var | 함수 스코프 | 재선언 가능 / 호이스팅 문제 / 지양 |
@@ -81,6 +86,7 @@ var string1 = num1 + ' 더하기 ' + num2 + '는 \'' + result + '\'';
 const string2 = `${num3} 더하기 ${num4}는 '${result2}'`;
 ```
 ---
+
 ### 함수 호이스팅
 
 #### 선언적 함수 - 호이스팅 O
@@ -101,7 +107,12 @@ var hello = function() {
 };
 ```
 ---
-#### 6. this와 콜백 함수에서의 우회
+</details>
+
+<details>
+<summary>2. 콜백 함수</summary>
+
+### this와 콜백 함수에서의 우회
 ```javascript
 var relationship1 = {
   name: 'zero',
@@ -119,7 +130,8 @@ relationship1.logFriends();
 - this는 바로 앞 객체를 가리킴
 - forEach 내부에서는 this가 달라지므로 that에 this를 저장해 해결
 ---
-#### 7. 함수 저장과 호출 차이
+
+### 함수 저장과 호출 차이
 ```javascript
 var candyMachine = {
   status: {
@@ -141,7 +153,7 @@ console.log(count); // 5 출력
 • count: 값 직접 접근
 ```
 ---
-#### 8. 클래스와 상속
+### 클래스와 상속
 ```javascript
 class Human {
   constructor(type = 'human') {
@@ -179,6 +191,11 @@ console.log(Human.breathe())
 - static: 클래스 메서드로 인스턴스 없이 호출 가능
 - instanceof: 클래스 인스턴스 여부 확인
 ---
+</details>
+
+<details>
+<summary>3. 노드 기능 알아보기</summary>
+
 #### URL
 - url 처리에는 크 두지 방식이 있다
 하는 노드 버전 7에서 추된 WHATWG(웹 표준을 정하는 단체의 이름) 방식의 url이고, 다른 하나는 예전부터 노드에서 사용하던 url방식 요즘은 WHATWG만 사용
@@ -191,6 +208,8 @@ console.log(Human.breathe())
 - set(키, 값): append와 비슷하지만 같은 키의 값들을모두 지우고 새로 추가합니다.
 - delete(키): 해당 키를 제거 합니다
 - toString(): 조작한 searchParams 객체를 다시 문자열로 만든다. 이 문자열을 search에 대입하면 주소 객체에 반영
+
+---
 
 #### DNS
 - 주로 도메인을 통해 IP나 키타 DNS 정보를 얻고자 할 때 사용합니다.
@@ -228,6 +247,7 @@ crypto.randomBytes(64, (err, buf) => { //64바이트 길이의 랜덤한 문자�
 pbkdf2() 메서드에는 순서대로 비밀번호, salt, 반복 횟수, 출력 바이트 해시 알고리즘을 인수로 넣는다.
 예시에서는 10만번 반복해서 적용한다.
 
+---
 
 ### 양방향 암호화
 - 암호화된 문자열을 복호화 할 수 있으며, 키라는 것이 사용된다.
@@ -248,6 +268,7 @@ let result2 = decipher.update(result, 'base64', 'utf8'); // 복호화할 문장�
 result2 += decipher.final('utf8');// 출력 인코딩 설정
 console.log('복호화:', result2);// 복호화된 문장 출력
 ```
+---
 
 #### utill
 - 유틸이라는 이름 처럼 각종 편의 기능을 모아둔 모듈. 계속 해서 API가 추가 되고 있으며, 가끔 deprecated되어 사아지는 경우도 있습니다.
@@ -311,6 +332,8 @@ if (isMainThread) { // 부모일 때
   parentPort.postMessage(data.start + 100); // 부모 스레드로 메시지를 보냄
 }
 ```
+---
+
 #### child_process
 - 노드에서 다른 프로그램을 실행하고 싶거나 명령어를 수행하고 싶을 떄 사용하는 모듈.
 이 모듈을 통해 다른 언어의 코드(예를 들면, 파이썬)를 실행하고 결과값을 받을 수 있습니다. 이름이 child_process(자식프로세스)인 이유는 현재 노드 프로세스 외에 새로운 프로세스를 띄워서 명령어를 수행하고 노드 프로세스에 결과를 알려 주기 떄문이다.
@@ -327,13 +350,21 @@ process.stderr.on('data', function(data) {
   console.error(data.toString());
 }); // 실행 에러1
 ```
+---
+
 #### 기타 모듈들
 - async_hooks: 비동기 코드의 흐름을 추적할 수 있는 실험적인 모듈입니다.
 - dgram: UDP와 관련된 작업을 할 때 사용합니다.
 - net: http보아 로우 레벨인 TCP나 IPC 통신을 할 떄 사용합니다.
 
 ---
-#### 파일 시스템 접근하기
+</details>
+
+
+<details>
+<summary>4. 파일 시스템 접근하기 </summary>
+
+### 파일 시스템 접근하기
 - fs 모듈은 파일 시스템에 접근하는 모듈 입니다. 즉 파일을 생성하거나 삭제하고, 읽거나 쓸 수 있습니다. 또한, 폴더도 만들거나 지울 수 있습니다. 웹 브라우저에서 자바스크립트를 사용할 때는 일부를 제외하고는 파일 시스템 접근이 금지되어 있으므로 노드 fs 모듈이 낯설 것이다.
 ```javascript
 const fs = require('fs'); // 파일 시스템 모듈
@@ -345,6 +376,7 @@ fs.readFile('./readme.txt', (err, data) => { // 파일 읽기 메서드 readFile
   console.log(data); // 파일 내용 출력 buffer 라는 이상한 것이 출력이 됨
   console.log(data.toString());// 파일 내용을 문자열로 출력 toString()을 이용해서 문자열로 출력 시킨다.
 });
+
 // 프로미스 버전
 const fs = require('fs').promises; // 파일 시스템 모듈
 
@@ -375,7 +407,9 @@ fs.writeFile('./writeme.txt', '글이 입력됩니다', (err) => { // 파일 쓰
   });
 });
 ```
-#### 동기 메서드와 비공기 메서드
+---
+
+### 동기 메서드와 비공기 메서드
 - setTimeout 같은 타이머와 process.nextTick 외에도, 노드는 대부분의 메서드를 비동기 방식으로 처리한다. 하지만 몇몇 메서드는 동기 방식으로도 사용할 수 있다. 특히 fs 모듈이 그러한 메서드를 많이 갖고 있다. 
 ```javascript
 const fs = require('fs');
@@ -412,7 +446,8 @@ data = fs.readFileSync('./readme2.txt');
 console.log('3번', data.toString());
 console.log('끝');
 ```
-#### Sync 메서드의 문제점 정리
+
+### Sync 메서드의 문제점 정리
 
 #### 개념
 `readFileSync` 같은 **Sync(동기) 메서드**는 코드 흐름을 이해하기는 쉽지만,  
@@ -491,18 +526,20 @@ fs.readFile('./readme2.txt')
     console.error(err);
   });
   ```
-#### 버퍼와 스트림 이해하기
+  ---
 
-#### 버퍼(Buffer)란?
+## 버퍼와 스트림 이해하기
+
+### 버퍼(Buffer)란?
 - **버퍼링**: 영상을 재생할 수 있을 만큼 데이터를 **모아두는 동작**
 - 노드에서 파일을 읽을 때, 파일 크기만큼 메모리를 확보하고 데이터를 저장하는데,  
   이 저장된 데이터 덩어리가 **버퍼**다.
 
-#### 스트림(Stream)이란?
+### 스트림(Stream)이란?
 - 데이터를 **조각조각 나눠서 전송**하는 방식
 - 예) 라이브 방송에서 방송인의 컴퓨터에서 시청자에게 영상 데이터를 실시간으로 전송하는 것
 
-#### 버퍼링 vs 스트리밍 비교
+### 버퍼링 vs 스트리밍 비교
 | 구분 | 설명 |
 |---|---|
 | 버퍼링 | 재생 전 데이터를 미리 모아둠 |
@@ -511,7 +548,7 @@ fs.readFile('./readme2.txt')
 
 ---
 
-## 📂 노드에서의 버퍼와 스트림
+###  노드에서의 버퍼와 스트림
 | 작업 | 설명 |
 |---|---|
 | 파일 읽기 (`readFile`) | 파일 전체를 버퍼로 읽어 메모리에 저장 |
@@ -519,7 +556,7 @@ fs.readFile('./readme2.txt')
 
 ---
 
-#### 스트림의 핵심 개념: 파이핑(Piping)
+### 스트림의 핵심 개념: 파이핑(Piping)
 - 스트림끼리 연결하는 작업을 **파이핑**이라고 함
 - 예) 파일을 읽는 스트림과 쓰는 스트림을 연결하면:
     - 읽으면서 바로 씀 (메모리 절약 + 빠른 처리)
@@ -537,7 +574,7 @@ const zlibStream = zlib.createGzip(); // zlib 스트림 생성
 - zlibStream: zlib 모듈도 제공하여 버퍼 데이터가 전달되다가 gzip 압축을 거친 후 압축 파일을 생성한다.
 ---
 
-#### 기타 fs 메서드 알아보기
+### 기타 fs 메서드 알아보기
 ```javascript
 const fs = require('fs');
 //fs.access(경로, 옵션, 콜백)
@@ -606,8 +643,9 @@ fs.access('./folder', constants.F_OK | constants.W_OK | constants.R_OK)
   });
 
 ```
+---
 
-#### 스레드 풀(Thread Pool) 정리
+### 스레드 풀(Thread Pool) 정리
 
 #### 개념
 - Node.js의 **fs 모듈 비동기 메서드**들은 실제로 **백그라운드에서 실행**됨
@@ -689,7 +727,10 @@ crypto.pbkdf2(pass, salt, 1000000, 128, 'sha512', () => {
 - UV_THREADPOOL_SIZE=1 이렇게 입력하면 순서대로 실행 됌
 
 ---
-### 4장
+</details>
+
+<details>
+<summary>5. http 모듈 서버 만들기 </summary>
 
 - 요청(Request): 클라이언트 -> 서버로 보내는 데이터 (ex. GET, POST 방식과 URL 정보 포함)
 - 응답(Response): 서버 -> 클라이언트로 보내는 데이터(ex. HTML, JSON, 상태 코드 등)
@@ -714,9 +755,7 @@ server.on('error', (error) => {
 ```
 ---
 
-
-
-#### REST & REST API 개념 정리
+### REST & REST API 개념 정리
 
 #### REST란?
 - **REST (REpresentational State Transfer)**  
@@ -755,7 +794,7 @@ server.on('error', (error) => {
 ---
 
 #### HTTP 요청 예시
-| 요청 방식 | URL | 의미 |
+| 요청 방식 | URL |
 |---|---|---|
 | `GET /user` | `/user` 자원의 데이터를 가져옴 (사용자 정보 조회) |
 | `POST /user` | `/user` 자원에 새로운 사용자 추가 |
@@ -769,8 +808,10 @@ server.on('error', (error) => {
 ✔️ **URL은 명사를 사용해야 함** (`/getUser ❌ → /user
 
 ---
+
 ### https와 http2
-## 📖 https란?
+
+##  https란?
 `https` 모듈은 웹 서버에 **SSL 암호화**를 추가합니다.  
 클라이언트가 서버에 GET이나 POST 요청을 보낼 때, 오가는 데이터를 암호화하여  
 **중간에서 데이터가 가로채여도 내용을 확인할 수 없게 보호**하는 역할을 합니다.
@@ -806,7 +847,7 @@ const http = require('http'); http.createServer((req, res) => {
 #### `parseCookies` 함수
 
 
-## 1️⃣ http 서버 예제
+### http 서버 예제
 ```javascript
 const http = require('http');
 
@@ -819,8 +860,6 @@ http.createServer((req, res) => {
   console.log('8080번 포트에서 서버 대기 중입니다!');
 });
 ```
-
-
 	•	http 모듈: 일반적인 **HTTP 서버 (80/8080 포트)**용
 	•	http.createServer: 서버 생성
 	•	req: 요청 객체
@@ -850,6 +889,7 @@ https.createServer({
   console.log('443번 포트에서 서버 대기 중입니다!');
 });
 ```
+
 	•	https 모듈: **SSL 인증서를 사용하는 보안 서버 (443 포트)**용
 	•	https.createServer: 보안 서버 생성
 	•	인증서 관련 설정 필요:
@@ -884,7 +924,6 @@ http2.createSecureServer({
 	•	http2 모듈: 최신 프로토콜인 HTTP/2 지원 서버 (빠른 속도 + 멀티플렉싱)
 	•	인증서 설정은 https와 거의 동일
 	•	포트번호: 443 (https와 같지만, 프로토콜이 다름)
-
 
 
 ### HTTP/1.1 특징
@@ -947,18 +986,24 @@ http2.createSecureServer({
 ### 핵심 요약
 **HTTP/2는 요청과 응답을 더 효율적으로 관리하여, 기존 HTTP/1.1보다 훨씬 빠르고 최적화된 최신 프로토콜이다. Node.js에서는 `http2` 모듈로 쉽게 구현 가능하며, SSL은 필수이다.**
 
-
+---
 
 #### cluster
 - 기본적으로 싱글 프로세스로 동작하는 노드가 CPU 코어를 모두 사용할 수 있게 해주는 모듈.
 - 포트를 공유하는 노드 프로세스를 여러 개 둘 수도 있어, 요청이 많이 들어왔을 때 병렬로 실행된 서버의 개수만큼 요청이 분산되게 할 수 있다.
-
 ---
+
+</details>
+
+<details>
+<summary>6. 익스프레스 웹 서버</summary>
+
 ### Express 미들웨어 & Multer 정리
 
 아래는 미들웨어와 Multer에 대한 개념과 설명을
 깔끔하게 마크다운으로 정리한 버전이야.
 바로 복사해서 README.md나 노트 정리할 때 써도 돼.
+
 ---
 
 ### 미들웨어 (Middleware)
@@ -977,7 +1022,7 @@ function middleware(req, res, next) {
 }
 ```
 
-### 미들웨어 종류
+#### 미들웨어 종류
 
 | 종류 | 설명 | 예시 |
 |---|---|---|
@@ -986,7 +1031,7 @@ function middleware(req, res, next) {
 | 에러 처리 미들웨어 | 에러 발생 시 실행 | `app.use((err, req, res, next) => {...})` |
 
 
-### 💡 주요 미들웨어 예시
+#### 주요 미들웨어 예시
 
 | 미들웨어 | 설명 |
 |---|---|
@@ -1009,7 +1054,7 @@ function middleware(req, res, next) {
 
 ---
 
-### 미들웨어 동작 흐름
+#### 미들웨어 동작 흐름
 
 요청 → 전역 미들웨어 → 라우터 미들웨어 → 응답
 ↑
@@ -1017,7 +1062,7 @@ function middleware(req, res, next) {
 
 ---
 
-### 주요 미들웨어 예시
+#### 주요 미들웨어 예시
 
 | 미들웨어 | 설명 |
 |---|---|
@@ -1032,12 +1077,12 @@ function middleware(req, res, next) {
 
 ### Multer (파일 업로드 미들웨어)
 
-###  Multer란?
+####  Multer란?
 - Express 전용 파일 업로드 미들웨어
 - 요청 본문에 포함된 파일 데이터를 해석하고, 지정된 경로에 저장
 
 
-###  기본 사용법
+####  기본 사용법
 ```javascript
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
@@ -1048,7 +1093,7 @@ app.post('/upload', upload.single('image'), (req, res) => {
 });
 ```
 
-⚙️ 저장 방식 설정 (diskStorage)
+#### 저장 방식 설정 (diskStorage)
 	•	파일명, 저장 폴더 직접 제어 가능
 ```javascript
 
@@ -1063,7 +1108,9 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 ```
-###  Multer 주요 메서드
+---
+
+####  Multer 주요 메서드
 
 | 메서드 | 설명 | 저장 위치 |
 |---|---|---|
@@ -1074,7 +1121,7 @@ const upload = multer({ storage });
 
 ---
 
-###  Multer 흐름 요약
+####  Multer 흐름 요약
 
 | 단계 | 설명 |
 |---|---|
@@ -1084,7 +1131,7 @@ const upload = multer({ storage });
 
 ---
 
-###  정리 요점
+####  정리 요점
 
 | 구분 | 설명 |
 |---|---|
@@ -1094,7 +1141,7 @@ const upload = multer({ storage });
 | 라우터 미들웨어 | 특정 경로에서 동작 |
 | 에러 미들웨어 | 에러 발생 시 동작 |
 
-### 결론
+#### 결론
 	•	미들웨어는 요청과 응답 흐름을 제어하는 필수 구성요소
 	•	Multer는 파일 업로드를 다룰 때 필수 미들웨어
 	•	파일 저장 방식, 업로드 용량 제한, 업로드 필드명 등을 모두 커스터마이징 가능
@@ -1190,22 +1237,20 @@ app.listen(app.get('port'), () => {
 });
 ```
 ---
+</details>
 
-## Router 객체로 라우팅 분리하기
+<details>
+<summary>7. Router 객체로 라우팅 분리하기</summary>
 
-
----
-
-#### 시퀄라이즈
+### 시퀄라이즈
 
 - npm i express morgan nunjucks sequelize sequelize-cli mysql2
 - npm i -D nodemon
 - npx sequelize init
 
-# Learn Sequelize
+### Learn Sequelize
 
 ## 프로젝트 구조
-
 ```
 learn-sequelize/
 ├── config/
@@ -1369,92 +1414,6 @@ app.use((req, res, next) => {
 14. **404 에러 처리 미들웨어**: 요청한 라우터가 없을 때 404 에러를 생성하고 처리합니다.
 이 세 개의 파일은 Express 애플리케이션에서 서로 연동되어 동작합니다. 동작 순서는 다음과 같습니다:
 
-1. **`app.js`**: 애플리케이션의 진입점으로, 서버를 설정하고 실행합니다.
-2. **`routes/page.js`**: 라우터 파일로, 특정 경로에 대한 요청을 처리합니다.
-3. **`controllers/page.js`**: 컨트롤러 파일로, 라우터에서 호출되는 함수들을 정의합니다.
-
-
-```javascript
-// 프로필 페이지 렌더링 함수
-exports.renderProfile = (req, res) => {
-    res.render('profile', { title: '내 정보 - NodeBird' }); // 'profile' 뷰를 렌더링하고, 제목을 '내 정보 - NodeBird'로 설정
-};
-
-// 회원가입 페이지 렌더링 함수
-exports.renderJoin = (req, res) => {
-    res.render('join', { title: '회원가입 - NodeBird' }); // 'join' 뷰를 렌더링하고, 제목을 '회원가입 - NodeBird'로 설정
-};
-
-// 메인 페이지 렌더링 함수
-exports.renderMain = (req, res, next) => {
-    const twits = []; // 빈 트윗 배열 생성
-    res.render('main', {
-        title: 'NodeBird', // 제목을 'NodeBird'로 설정
-        twits, // 트윗 배열을 뷰에 전달
-    });
-};
-```
-
-### `req`, `res`, `next`의 의미
-
-- **`req` (Request)**: 클라이언트의 요청 객체입니다. 클라이언트가 서버로 보내는 모든 요청 정보가 담겨 있습니다. 예를 들어, 요청 경로, HTTP 메서드, 요청 본문, 쿼리 스트링, 헤더 등이 포함됩니다.
-
-- **`res` (Response)**: 서버의 응답 객체입니다. 서버가 클라이언트로 보내는 응답을 구성하는 데 사용됩니다. 예를 들어, 응답 본문, 상태 코드, 헤더 등을 설정할 수 있습니다. 여기서 `res.render` 메서드를 사용하여 특정 뷰를 렌더링하고 클라이언트에게 응답합니다.
-
-- **`next` (Next)**: 다음 미들웨어 함수를 호출하는 함수입니다. 현재 미들웨어 함수가 완료된 후, 다음 미들웨어 함수로 제어를 전달할 때 사용됩니다. 주로 에러 처리나 특정 조건에서 다음 미들웨어로 넘어갈 때 사용됩니다. 이 예제에서는 `renderMain` 함수에서 `next`가 사용되지 않았지만, 필요에 따라 사용할 수 있습니다.
-네, 맞습니다. `req`와 `res`는 각각 요청과 응답을 처리하는 객체입니다.
-
-### `req` (Request)
-- **설명**: 클라이언트가 서버로 보내는 요청 정보를 담고 있는 객체입니다.
-- **주요 속성**:
-  - `req.url`: 요청된 URL 경로
-  - `req.method`: HTTP 메서드 (GET, POST 등)
-  - `req.body`: 요청 본문 (POST 요청에서 주로 사용)
-  - `req.query`: 쿼리 스트링 파라미터
-  - `req.params`: URL 경로 파라미터
-  - `req.headers`: 요청 헤더
-
-### `res` (Response)
-- **설명**: 서버가 클라이언트로 보내는 응답을 구성하는 객체입니다.
-- **주요 메서드**:
-  - `res.send()`: 응답 본문을 클라이언트로 보냅니다.
-  - `res.json()`: JSON 형식의 응답 본문을 클라이언트로 보냅니다.
-  - `res.status()`: 응답 상태 코드를 설정합니다.
-  - `res.render()`: 템플릿 엔진을 사용하여 뷰를 렌더링하고 응답 본문으로 보냅니다.
-  - `res.redirect()`: 클라이언트를 다른 URL로 리디렉션합니다.
-
-### 예시 코드 설명
-
-```javascript
-// 프로필 페이지 렌더링 함수
-exports.renderProfile = (req, res) => {
-    res.render('profile', { title: '내 정보 - NodeBird' }); // 'profile' 뷰를 렌더링하고, 제목을 '내 정보 - NodeBird'로 설정
-};
-
-// 회원가입 페이지 렌더링 함수
-exports.renderJoin = (req, res) => {
-    res.render('join', { title: '회원가입 - NodeBird' }); // 'join' 뷰를 렌더링하고, 제목을 '회원가입 - NodeBird'로 설정
-};
-
-// 메인 페이지 렌더링 함수
-exports.renderMain = (req, res, next) => {
-    const twits = []; // 빈 트윗 배열 생성
-    res.render('main', {
-        title: 'NodeBird', // 제목을 'NodeBird'로 설정
-        twits, // 트윗 배열을 뷰에 전달
-    });
-};
-```
-
-- **`exports.renderProfile`**: 클라이언트가 `/profile` 경로로 요청을 보냈을 때 호출됩니다. `res.render('profile', { title: '내 정보 - NodeBird' })`를 통해 `profile` 뷰를 렌더링하고, 제목을 '내 정보 - NodeBird'로 설정하여 응답합니다.
-- **`exports.renderJoin`**: 클라이언트가 `/join` 경로로 요청을 보냈을 때 호출됩니다. `res.render('join', { title: '회원가입 - NodeBird' })`를 통해 `join` 뷰를 렌더링하고, 제목을 '회원가입 - NodeBird'로 설정하여 응답합니다.
-- **`exports.renderMain`**: 클라이언트가 루트 경로(`/`)로 요청을 보냈을 때 호출됩니다. `const twits = [];`로 빈 트윗 배열을 생성하고, `res.render('main', { title: 'NodeBird', twits })`를 통해 `main` 뷰를 렌더링하여 응답합니다. 여기서 `twits` 배열은 뷰에 전달됩니다.
-
-따라서, `req`는 클라이언트의 요청 정보를 담고 있고, `res`는 서버의 응답을 구성하여 클라이언트로 보내는 역할을 합니다.
-
-
-### 동작 순서
-
 1. **서버 시작 (`app.js`)**
    - `app.js` 파일이 실행되면서 Express 애플리케이션이 생성되고 설정됩니다.
    - 포트 설정, 뷰 엔진 설정, 미들웨어 설정 등이 이루어집니다.
@@ -1485,5 +1444,11 @@ exports.renderMain = (req, res, next) => {
 3. **클라이언트가 `/` 경로로 GET 요청을 보냅니다.**
    - `app.js`에서 이 요청을 `pageRouter`로 위임합니다.
    - page.js에서 `/` 경로에 대한 GET 요청을 처리하는 `router.get('/', renderMain);`가 실행됩니다.
-   - `renderMain` 함수가 page.js에서 호출되어 `main` 뷰를 렌더링하고 응답을 반환합니다.
+   - `renderMain` 함수가 page.js에서 호출되어 `main` 뷰를 렌더링하여 응답합니다. 여기서 `twits` 배열은 뷰에 전달됩니다.
+
+따라서, `req`는 클라이언트의 요청 정보를 담고 있고, `res`는 서버의 응답을 구성하여 클라이언트로 보내는 역할을 합니다.
+
+</details>
+
+
 
