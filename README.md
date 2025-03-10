@@ -1455,6 +1455,78 @@ app.use((req, res, next) => {
 
 따라서, `req`는 클라이언트의 요청 정보를 담고 있고, `res`는 서버의 응답을 구성하여 클라이언트로 보내는 역할을 합니다.
 
+---
+
+
+# Nodebird 프로젝트 구조
+
+## [config]
+- `config.json`: DB 연결정보 (development)
+
+## [controllers]
+- `auth.js`: `join`, `login`, `logout`
+- `page.js`: `renderProfile`, `renderMain`, `renderJoin`, `renderHashtag`
+- `post.js`: `afterUploadImage`, `uploadPost`
+- `user.js`: `follow`
+
+## [middlewares]
+- `index.js`: `isLoggedIn`, `isNotLoggedIn`
+
+## [migrations]
+
+## [models]
+- `index.js`
+- `post.js`
+- `user.js`
+- `hashtag.js`
+
+## [node_modules]
+
+## [passport]
+- `index.js`: `passport.serializeUser`, `passport.deserializeUser`
+- `localStrategy.js`: `passport.use`
+- `kakaoStrategy.js`: `passport.use`
+
+## [public]
+- `main.css`
+
+## [routes]
+- `auth.js`
+  - `POST /auth/join`: `isNotLoggedIn`, `join`
+  - `POST /auth/login`: `isNotLoggedIn`, `login`
+  - `GET /auth/logout`: `isLoggedIn`, `logout`
+  - `GET /auth/kakao`: `passport.authenticate('kakao')`
+  - `GET /auth/kakao/callback`
+- `page.js`
+  - `GET /profile`: `isLoggedIn`, `renderProfile`
+  - `GET /join`: `isNotLoggedIn`, `renderJoin`
+  - `GET /`: `renderMain`
+  - `GET /hashtag`: `renderHashtag`
+- `post.js`
+  - `POST /post/img`: `isLoggedIn`, `upload.single('img')`, `afterUploadImage`
+  - `POST /post`: `isLoggedIn`, `upload2.none()`, `uploadPost`
+- `user.js`
+  - `POST /user/:id/follow`: `isLoggedIn`, `follow`
+
+## [seeders]
+
+## [uploads]
+- 자동생성 + 업로드된 파일 저장
+
+## [views]
+- `layout.html`
+- `error.html`
+- `main.html`
+- `join.html`
+- `profile.html`
+
+## 기타 파일
+- `.env`
+- `app.js`
+- `package-lock.json`
+- `package.json`
+
+
 </details>
 
 
