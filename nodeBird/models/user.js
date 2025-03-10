@@ -48,6 +48,7 @@ class User extends Sequelize.Model{
             as: 'Followings', // as는 시퀄라이즈가 JOIN 작업 시 사용
             through: 'Follow', // as와 반대되는 모델을 가리킴
         });
+        db.User.belongsToMany(db.Post,{through:'Like'});
     }
 };
 

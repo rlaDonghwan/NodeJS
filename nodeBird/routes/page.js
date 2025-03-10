@@ -22,5 +22,30 @@ router.get('/', renderMain);
 
 router.get('/hashtag', renderHashtag);
 
+router.get('/', (req,res,next)=>{
+  Post.findAll({
+      include:[{
+          model: User,
+          attributes:['id','nick'],
+      },{
+          model: User,
+          attributes:['id','nick'],
+          as: 'Liker',
+      }],
+  })
+  .then((posts)=>{
+      res.render('main',{
+          title:'NodeBird',
+          twits:posts,
+          user:req.user,
+      });
+  })
+  .catch((error)=>{
+      console.error(error);
+      next(error);
+  });
+});
+
+
 module.exports = router;
    
